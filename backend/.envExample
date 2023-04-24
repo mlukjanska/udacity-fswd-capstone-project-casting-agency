@@ -1,3 +1,14 @@
 AUTH0_DOMAIN=auth0_domain
 AUTH0_ALGORITHMS='RS256'
 AUTH0_API_AUDIENCE=auth0_api_audience
+
+DATABASE_NAME=db_name
+DATABASE_USERNAME=db_username
+DATABASE_PASSWORD=password
+DATABASE_HOST=localhost
+DATABASE_PORT=5433
+
+# TEST Variables
+TEST_DATABASE_NAME=db_name_test
+AUTH0_TEST_CLIENT_ID=auth0_test_client_id
+AUTH0_TEST_CLIENT_SECRET=auth0_test_client_secret

@@ -5,6 +5,10 @@ from flask import jsonify
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 from dotenv import load_dotenv
+from jose import jwt
+import json
+import requests
+
 
 from api import create_app
 from database.models import setup_db, Actor, Movie
@@ -12,9 +16,47 @@ from database.models import setup_db, Actor, Movie
 
 load_dotenv()
 
+def memoize(function):
+    memo = {}
+    def wrapper(*args):
+        if args in memo:
+            return memo[args]
+        else:
+            rv = function(*args)
+            memo[args] = rv
+            return rv
+    return wrapper
 
 class CastingAgencyTestCase(unittest.TestCase):
     """This class represents the casting agency test cases"""
+
+    # https://stackoverflow.com/questions/48552474/auth0-obtain-access-token-for-unit-tests-in-python/48554119#48554119
+    def getUserToken(self, userName):
+        # testing user (with the most permissions):
+        testingUsers = {
+            'executive_producer@test.com': 'DstK9V29_wMTdw*-', 
+        }
+        # client id and secret come from LogIn (Test Client)! which has password enabled under "Client > Advanced > Grant Types > Tick Password"
+        url = 'https://'+ os.getenv('AUTH0_DOMAIN') + '/oauth/token' 
+        headers = {'content-type': 'application/json'}
+        password = testingUsers[userName]
+        parameter = { 
+            "client_id": os.getenv('AUTH0_TEST_CLIENT_ID'), 
+            "client_secret": os.getenv('AUTH0_TEST_CLIENT_SECRET'), 
+            "audience": os.getenv('AUTH0_API_AUDIENCE'), 
+            "grant_type": "password",
+            "username": userName,
+            "password": password, 
+            "scope": "openid" 
+        } 
+        # do the equivalent of a CURL request from https://auth0.com/docs/quickstart/backend/python/02-using#obtaining-an-access-token-for-testing
+        responseDICT = json.loads(requests.post(url, json=parameter, headers=headers).text)
+        return responseDICT['access_token']
+
+    @memoize # memoize code from: https://stackoverflow.com/a/815160
+    def getUserTokenHeaders(self, userName='executive_producer@test.com'):
+        return { 'authorization': "Bearer " + self.getUserToken(userName)} 
+
 
     def setUp(self):
         """Define test variables and initialize app."""
@@ -27,6 +69,8 @@ class CastingAgencyTestCase(unittest.TestCase):
         self.database_name = os.getenv('TEST_DATABASE_NAME')
         self.database_path = "postgresql://{}:{}@{}/{}".format(database_username, database_password, database_host + ":" + database_port, self.database_name)
         setup_db(self.app, self.database_path)
+
+        self.authorization_header = self.getUserTokenHeaders()
 
         # binds the app to the current context
         with self.app.app_context():
@@ -49,7 +93,7 @@ class CastingAgencyTestCase(unittest.TestCase):
             age=27,
             gender='male')
         actor.insert()
-        res = self.client().get("/actors")
+        res = self.client().get("/actors", headers=self.authorization_header)
         self.assertTrue(res)
         self.assertEqual(res.status_code, 200)
         data = json.loads(res.data)
@@ -66,7 +110,7 @@ class CastingAgencyTestCase(unittest.TestCase):
             "age": 42, 
             "gender": "Male"
         }
-        res = self.client().post("/actors", json=new_actor)
+        res = self.client().post("/actors", json=new_actor, headers=self.authorization_header)
         self.assertTrue(res)
         self.assertEqual(res.status_code, 200)
 
@@ -85,7 +129,7 @@ class CastingAgencyTestCase(unittest.TestCase):
             "name": "Test Get Actor", 
             "age": 42
         }
-        res = self.client().post("/actors", json=new_actor)
+        res = self.client().post("/actors", json=new_actor, headers=self.authorization_header)
         self.assertTrue(res)
         self.assertEqual(res.status_code, 422)
 
@@ -99,7 +143,7 @@ class CastingAgencyTestCase(unittest.TestCase):
             age=27,
             gender='male')
         actor.insert()
-        res = self.client().delete("/actors/" + str(actor.id))
+        res = self.client().delete("/actors/" + str(actor.id), headers=self.authorization_header)
         self.assertTrue(res)
         self.assertEqual(res.status_code, 200)
 
@@ -122,7 +166,7 @@ class CastingAgencyTestCase(unittest.TestCase):
             "age": 11, 
             "gender": "Female"
         }
-        res = self.client().patch("/actors/" + str(actor.id), json=patch_actor)
+        res = self.client().patch("/actors/" + str(actor.id), json=patch_actor, headers=self.authorization_header)
         self.assertTrue(res)
         self.assertEqual(res.status_code, 200)
         updated_data = json.loads(res.data)
@@ -143,7 +187,7 @@ class CastingAgencyTestCase(unittest.TestCase):
           title='Test Movie',
           release_date='11-12-2023')
         movie.insert()
-        res = self.client().get("/movies")
+        res = self.client().get("/movies", headers=self.authorization_header)
         self.assertTrue(res)
         self.assertEqual(res.status_code, 200)
         data = json.loads(res.data)
@@ -159,7 +203,7 @@ class CastingAgencyTestCase(unittest.TestCase):
             "title": "Test Get Movie", 
             "release_date": '11-12-2023', 
         }
-        res = self.client().post("/movies", json=new_movie)
+        res = self.client().post("/movies", json=new_movie, headers=self.authorization_header)
         self.assertTrue(res)
         self.assertEqual(res.status_code, 200)
         data = json.loads(res.data)
@@ -175,7 +219,7 @@ class CastingAgencyTestCase(unittest.TestCase):
         new_movie = {
             "title": "Test Get Movie - 422", 
         }
-        res = self.client().post("/movies", json=new_movie)
+        res = self.client().post("/movies", json=new_movie, headers=self.authorization_header)
         self.assertTrue(res)
         self.assertEqual(res.status_code, 422)
 
@@ -188,7 +232,7 @@ class CastingAgencyTestCase(unittest.TestCase):
           title='Test Movie',
           release_date='11-12-2023')
         movie.insert()
-        res = self.client().delete("/movies/" + str(movie.id))
+        res = self.client().delete("/movies/" + str(movie.id), headers=self.authorization_header)
         self.assertTrue(res)
         self.assertEqual(res.status_code, 200)
 
@@ -209,7 +253,7 @@ class CastingAgencyTestCase(unittest.TestCase):
             "title": "Test Get Movie - 422", 
             "release_date": '11-12-2023', 
         }
-        res = self.client().patch("/movies/" + str(movie.id), json=patch_movie)
+        res = self.client().patch("/movies/" + str(movie.id), json=patch_movie, headers=self.authorization_header)
         self.assertTrue(res)
         self.assertEqual(res.status_code, 200)
         updated_data = json.loads(res.data)

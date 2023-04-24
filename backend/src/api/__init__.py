@@ -40,7 +40,8 @@ def create_app(test_config=None):
             or appropriate status code indicating reason for failure
     '''
     @app.route("/actors")
-    def get_actors():
+    @requires_auth('get:actors')
+    def get_actors(payload):
         try:
             actors = Actor.query.order_by(Actor.id).all()
             repr_actors = [actor.repr() for actor in actors]
@@ -49,7 +50,7 @@ def create_app(test_config=None):
             return jsonify(
                 {
                     "success": True,
-                    "actors": [repr_actors],
+                    "actors": repr_actors,
                     "total_actors": len(Actor.query.all()),
                 }
             )
@@ -67,8 +68,8 @@ def create_app(test_config=None):
             or appropriate status code indicating reason for failure
     '''
     @app.route("/actors", methods=["POST"])
-    # @requires_auth('post:actors')
-    def create_actor():
+    @requires_auth('post:actors')
+    def create_actor(payload):
         try:
             body = request.get_json()
             new_actor_name = body.get("name", None)
@@ -105,9 +106,9 @@ def create_app(test_config=None):
              or appropriate status code indicating reason for failure
     '''
     @app.route("/actors/<actor_id>", methods=["PATCH"])
-    # @requires_auth('patch:actors')
-    # def update_actor(payload, actor_id):
-    def update_actor(actor_id):
+    @requires_auth('patch:actors')
+    def update_actor(payload, actor_id):
+    # def update_actor(actor_id):
         try:
             actor_id = int(actor_id)
             actor = Actor.query.filter(Actor.id == actor_id).one_or_none()
@@ -150,9 +151,9 @@ def create_app(test_config=None):
              or appropriate status code indicating reason for failure
     '''
     @app.route("/actors/<actor_id>", methods=["DELETE"])
-    # @requires_auth('delete:actors')
-    # def delete_actor(payload, actor_id):
-    def delete_actor(actor_id):
+    @requires_auth('delete:actors')
+    def delete_actor(payload, actor_id):
+    # def delete_actor(actor_id):
         try:
             actor_id = int(actor_id)
             actor = Actor.query.filter(Actor.id == actor_id).one_or_none()
@@ -180,7 +181,8 @@ def create_app(test_config=None):
             or appropriate status code indicating reason for failure
     '''
     @app.route("/movies")
-    def get_movies():
+    @requires_auth('get:movies')
+    def get_movies(payload):
         try:
             movies = Movie.query.order_by(Movie.id).all()
             repr_movies = [movie.repr() for movie in movies]
@@ -199,16 +201,15 @@ def create_app(test_config=None):
             else:
                 abort(422)
 
-    '''
-        POST /movies
+    ''' POST /movies
             creates a new row in the movies table
             requires the 'post:movies' permission
         returns status code 200 and json {"success": True, "movies": movie} where movie an array containing only the newly created movie
             or appropriate status code indicating reason for failure
     '''
     @app.route("/movies", methods=["POST"])
-    # @requires_auth('post:movies')
-    def create_movie():
+    @requires_auth('post:movies')
+    def create_movie(payload):
         try:
             body = request.get_json()
             new_movie_title = body.get("title", None)
@@ -242,9 +243,9 @@ def create_app(test_config=None):
              or appropriate status code indicating reason for failure
     '''
     @app.route("/movies/<movie_id>", methods=["PATCH"])
-    # @requires_auth('patch:movies')
-    # def update_movie(payload, movie_id):
-    def update_movie(movie_id):
+    @requires_auth('patch:movies')
+    def update_movie(payload, movie_id):
+    # def update_movie(movie_id):
         try:
             movie_id = int(movie_id)
             movie = Movie.query.filter(Movie.id == movie_id).one_or_none()
@@ -284,9 +285,9 @@ def create_app(test_config=None):
              or appropriate status code indicating reason for failure
     '''
     @app.route("/movies/<movie_id>", methods=["DELETE"])
-    # @requires_auth('delete:movies')
-    # def delete_movie(payload, movie_id):
-    def delete_movie(movie_id):
+    @requires_auth('delete:movies')
+    def delete_movie(payload, movie_id):
+    # def delete_movie(movie_id):
         try:
             movie_id = int(movie_id)
             movie = Movie.query.filter(Movie.id == movie_id).one_or_none()
