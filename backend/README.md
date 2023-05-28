@@ -110,7 +110,7 @@ FLASK_APP=./src/api.py flask run --reload
 The `--reload` flag will detect file changes and restart the server automatically.
 
 ## Authorization
- 
+
 ### Setup Auth0
 
 1. Create a new Auth0 Account
@@ -135,7 +135,7 @@ The `--reload` flag will detect file changes and restart the server automaticall
 7. Test your endpoints with [Postman](https://getpostman.com).
    - Register 2 users - assign the Barista role to one and Manager role to the other.
    - Sign into each account and make note of the JWT.
-   - Import the postman collection `./starter_code/backend/udacity-fsnd-udaspicelatte.postman_collection.json`
+   - Import the postman collection `./backend/udacity-fswd-casting-agency.postman_collection.json`
    - Right-clicking the collection folder for barista and manager, navigate to the authorization tab, and including the JWT in the token field (you should have noted these JWTs).
    - Run the collection and correct any errors.
    - Export the collection overwriting the one we've included so that we have your proper JWTs during review!
@@ -159,4 +159,212 @@ python test_flaskr.py
 docker compose down # to remove the container and any stored data if needed
 docker compose up # to start docker container with seeded data
 python test_flaskr.py
+```
+
+## API Reference
+
+### Getting Started
+- Base URL: 
+  - Locally: the backend app is hosted at the default: `http://127.0.0.1:5000/`.
+- Authentication: This version of the application does not require authentication or API keys. 
+
+### Error Handling
+Errors are returned as JSON objects in the following format:
+```json
+{
+    "success": false, 
+    "error": 400,
+    "message": "bad request"
+}
+```
+The API will return three error types when requests fail:
+- 400: Bad Request
+- 404: Resource Not Found
+- 422: Not Processable 
+
+### Endpoints 
+
+The samples are provided for the endpoints when the service is started locally at `http://127.0.0.1:5000`.
+
+#### GET /actors
+- Fetches actors in which the keys are the ids and the value is the corresponding string of the category type.
+- Request Arguments: None
+- Returns: An object with keys:
+    - `actors` - list of objects `actor`, key: value pairs,
+    - `success` - indicates if a response was successful, `boolean` value,
+    - `total_actors` - number of total actors, `number` value.
+- Sample: `curl http://127.0.0.1:5000/actors`
+- Response sample:
+```json
+{
+    "actors": [
+        {
+            "age": 50,
+            "gender": "Male",
+            "id": 1,
+            "name": "Brad Pitt"
+        }
+    ],
+    "success": true,
+    "total_actors": 1
+}
+```
+
+#### DELETE /actors/{actor_id}
+- General:
+    - Deletes the actor of the given `id` if it exists.
+- Request Arguments: `actor_id`
+- Returns: An object with keys:
+    - `deleted` - deleted actors id value,
+    - `success` - indicates if a response was successful, `boolean` value,
+- Sample: `curl -X DELETE http://127.0.0.1:5000/actors/1`
+- Response sample:
+```json
+{
+  "deleted": 1, 
+  "success": true
+}
+```
+
+#### POST /actors
+- General:
+    - Creates a new actor entry using the submitted actor content, category id, difficulty and answer.
+- Request Arguments: None
+- Returns: An object with keys:
+    - `actors` - object with the following key: value pairs
+      - `id` - new actor's id value, `number`
+      - `name` - actor's name, `string`
+      - `gender` - actor's gender, `string`
+      - `age` - actor's age, `number`
+    - `success` - indicates if a response was successful, `boolean` value,
+- Sample: `curl http://127.0.0.1:5000/actors -X POST -H "Content-Type: application/json" -d '{"name":"John Doe","gender":"Male","age":10}'`
+- Response sample:
+```json
+{
+    "actors": [
+        {
+            "age": 50,
+            "gender": "Male",
+            "id": 1,
+            "name": "Brad Pitt"
+        }
+    ],
+    "success": true
+}
+```
+
+#### PATCH /actors/{actor_id}
+- General:
+    - Patches an existing actor's entry using the submitted actor content.
+- Request Arguments: None
+- Returns: An object with keys:
+    - `actors` - object with the following key: value pairs
+      - `id` - new actor's id value, `number`
+      - `name` - actor's name, `string`
+      - `gender` - actor's gender, `string`
+      - `age` - actor's age, `number`
+    - `success` - indicates if a response was successful, `boolean` value,
+- Sample: `curl http://127.0.0.1:5000/actors/1 -X POST -H "Content-Type: application/json" -d '{"name":"John Doe","gender":"Male","age":10}'`
+- Response sample:
+```json
+{
+    "actors": [
+        {
+            "age": 10,
+            "gender": "Male",
+            "id": 1,
+            "name": "John Doe"
+        }
+    ],
+    "success": true
+}
+```
+
+#### GET /movies
+- Fetches movies in which the keys are the ids and the value is the corresponding string of the category type.
+- Request Arguments: None
+- Returns: An object with keys:
+    - `movies` - list of objects `movie`, key: value pairs,
+    - `success` - indicates if a response was successful, `boolean` value,
+    - `total_movies` - number of total movies, `number` value.
+- Sample: `curl http://127.0.0.1:5000/movies`
+- Response sample:
+```json
+{
+    "movies": [
+        {
+            "id": 1,
+            "release_date": "01-01-2020",
+            "title": "Fast and Furious"
+        }
+    ],
+    "success": true
+}
+```
+
+#### DELETE /movies/{movie_id}
+- General:
+    - Deletes the movie of the given `id` if it exists.
+- Request Arguments: `movie_id`
+- Returns: An object with keys:
+    - `deleted` - deleted movies id value,
+    - `success` - indicates if a response was successful, `boolean` value,
+- Sample: `curl -X DELETE http://127.0.0.1:5000/movies/1`
+- Response sample:
+```json
+{
+  "deleted": 1, 
+  "success": true
+}
+```
+
+#### POST /movies
+- General:
+    - Creates a new movie entry using the submitted movie content, category id, difficulty and answer.
+- Request Arguments: None
+- Returns: An object with keys:
+    - `movies` - object with the following key: value pairs
+      - `id` - new movie's id value, `number`
+      - `title` - movie's title, `string`
+      - `release_date` - movie's release_date, `string`
+    - `success` - indicates if a response was successful, `boolean` value,
+- Sample: `curl http://127.0.0.1:5000/movies -X POST -H "Content-Type: application/json" -d '{"title":"Fast and Furious","release_date":"01-01-2020"}'`
+- Response sample:
+```json
+{
+    "movies": [
+        {
+            "id": 1,
+            "release_date": "01-01-2020",
+            "title": "Fast and Furious"
+        }
+    ],
+    "success": true
+}
+```
+
+#### PATCH /movies/{movie_id}
+- General:
+    - Patches an existing movie's entry using the submitted movie content.
+- Request Arguments: None
+- Returns: An object with keys:
+    - `movies` - object with the following key: value pairs
+      - `id` - new movie's id value, `number`
+      - `title` - movie's title, `string`
+      - `release_date` - movie's release_date, `string`
+    - `success` - indicates if a response was successful, `boolean` value,
+- Sample: `curl http://127.0.0.1:5000/movies/1 -X POST -H "Content-Type: application/json" -d '{"name":"John Doe","gender":"Male","age":10}'`
+- Response sample:
+```json
+{
+    "movies": [
+        {
+            "age": 10,
+            "gender": "Male",
+            "id": 1,
+            "name": "John Doe"
+        }
+    ],
+    "success": true
+}
 ```
