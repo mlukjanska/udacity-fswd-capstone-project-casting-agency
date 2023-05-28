@@ -23,3 +23,4 @@ python-dotenv==0.21.1
 psycopg2-binary==2.9.5
 babel==2.9.0
 python-dateutil==2.6.0
+gunicorn==19.7.1
