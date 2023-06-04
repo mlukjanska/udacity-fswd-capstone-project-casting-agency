@@ -33,26 +33,6 @@ def setup_db(app, database_path=database_path):
     migrate.init_app(app, db)
     db.create_all()
 
-'''
-db_drop_and_create_all()
-    drops the database tables and starts fresh
-    can be used to initialize a clean database
-    !!NOTE you can change the database_filename variable to have multiple verisons of a database
-'''
-
-
-# def db_drop_and_create_all():
-#     db.drop_all()
-#     db.create_all()
-#     # add one demo row which is helping in POSTMAN test
-#     # drink = Drink(
-#     #     title='water',
-#     #     recipe='[{"name": "water", "color": "blue", "parts": 1}]'
-#     # )
-
-
-#     # drink.insert()
-
 ''' Movie
 a persistent movie entity, extends the base SQLAlchemy Model
 '''
