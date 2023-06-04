@@ -143,12 +143,19 @@ The `--reload` flag will detect file changes and restart the server automaticall
    - Executive Producer
      - can perform all actions
 7. Test your endpoints with [Postman](https://getpostman.com).
-   - Register 3 users - assign the Casting Assistant, Casting Director and Executive Producer roles accordingly.
+   - Register 3 users in Auth0 - assign the Casting Assistant, Casting Director and Executive Producer roles accordingly.
+   - Get the JWT using the Auth0 url like: `https://<auth0_account_url>/authorize?audience=<auth0_app_audience>
+&response_type=token&client_id=<auth0_app_client_id>&redirect_uri=<auth0_app_redirect_uri>`. 
+```
+Example Auth0 url: https://dev-jmfhs3otmbnisds.us.auth0.com/authorize?audience=https://casting-agency-api/
+&response_type=token&client_id=XoUGhbPpaGI7yqQdfsdfdsfds&redirect_uri=http://localhost:8100/tabs/user-page
+
+Note: After entering user credentials, one will be redirect to non existing web page, but the token will be present in the redirect URL, so one can just copy it out from the url.
+```
+
    - Sign into each account and make note of the JWT.
-   - Import the postman collection `./backend/udacity-fswd-casting-agency.postman_collection.json`
-   - Right-clicking the collection folder for barista and manager, navigate to the authorization tab, and including the JWT in the token field (you should have noted these JWTs).
-   - Run the collection and correct any errors.
-   - Export the collection overwriting the one we've included so that we have your proper JWTs during review!
+   - Import the postman collection `./backend/postman_collection/casting-agency.postman_collection.json`.
+   - Test the endpoints using the obtained JWT tokens.
 
 ## Testing
 
@@ -176,6 +183,7 @@ python test_api.py
 ### Getting Started
 - Base URL: 
   - Locally: the backend app is hosted at the default: `http://127.0.0.1:5000/`.
+  - Hosted on Render: the backend app is running at endpoint: `https://casting-agency-srv-prd.onrender.com`.
 - Authentication: The application uses JWT Bearer tokens for authorization with roles based permissions (see the Authorization section for details).   
 
 ### Error Handling

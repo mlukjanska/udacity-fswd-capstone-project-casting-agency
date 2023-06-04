@@ -1,11 +1,8 @@
 import os
 import unittest
 import json
-from flask import jsonify
 from flask_sqlalchemy import SQLAlchemy
-from datetime import datetime
 from dotenv import load_dotenv
-from jose import jwt
 import json
 import requests
 
@@ -34,7 +31,7 @@ class CastingAgencyTestCase(unittest.TestCase):
     def getUserToken(self, userName):
         # testing user (with the most permissions):
         testingUsers = {
-            'executive_producer@test.com': 'DstK9V29_wMTdw*-', 
+            os.getenv('TEST_USERNAME'): os.getenv('TEST_PASSWORD'), 
         }
         # client id and secret come from LogIn (Test Client)! which has password enabled under "Client > Advanced > Grant Types > Tick Password"
         url = 'https://'+ os.getenv('AUTH0_DOMAIN') + '/oauth/token' 

@@ -12,3 +12,5 @@ DATABASE_PORT=5433
 TEST_DATABASE_NAME=db_name_test
 AUTH0_TEST_CLIENT_ID=auth0_test_client_id
 AUTH0_TEST_CLIENT_SECRET=auth0_test_client_secret
+TEST_USERNAME=test_username
+TEST_PASSWORD=test_password
