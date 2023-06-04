@@ -317,8 +317,6 @@ def create_app(test_config=None):
             }), 404
 
     '''
-
-    # Error Handling
     @app.errorhandler(422)
     def unprocessable(error):
         return jsonify({
@@ -327,10 +325,6 @@ def create_app(test_config=None):
             "message": "unprocessable"
         }), 422
 
-    '''
-        error handler for 404
-        error handler should conform to general task above
-    '''
     @app.errorhandler(404)
     def resource_not_found(error):
         return jsonify({
@@ -339,17 +333,13 @@ def create_app(test_config=None):
             "message": "resource not found"
         }), 404
 
-    '''
-        error handler for AuthError
-        error handler should conform to general task above
-    '''
-
     @app.errorhandler(AuthError)
     def auth_error(ex):
+        print("AuthError was raised with", ex)
         return jsonify({
             "success": False,
-            "error": ex.code,
-            "message": str(ex.description) # did not manage to extract the description only
-        }), ex.code
+            "error": ex.status_code,
+            "message": ex.error['description']
+        }), ex.status_code
     
     return app
